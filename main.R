@@ -4,6 +4,8 @@
 library(tidyverse)
 # Includes table formatting tools.
 library(table1)
+library(kableExtra)
+# library(DT)
 
 ### Data was copied from https://understandinguncertainty.org/node/214
 
@@ -25,12 +27,24 @@ label(nightingale$V6) <- "Annual Rate of Mortality per 1000: Zymotic Diseases"
 label(nightingale$V7) <- "Annual Rate of Mortality per 1000: Wounds & Injuries"
 label(nightingale$V8) <- "Annual Rate of Mortality per 1000: All Other Causes"
 # Units
-units(nightingale$V6) <- "12000D/S"
-units(nightingale$V7) <- "12000D/S"
-units(nightingale$V8) <- "12000D/S"
+# units(nightingale$V6) <- "12000D/S"
+# units(nightingale$V7) <- "12000D/S"
+# units(nightingale$V8) <- "12000D/S"
 
 ### Re-build table.
-nightingale <- table1(~ V1 | V1, V2, V3, V4, V5, V6, V7, V8, data = nightingale)
+# table1(~ V1 + V2 + V3 + V4 + V5 + V6 + V7 + V8, data = nightingale)
+
+
+
+labels <- list(variables = list(V1 = "Months",
+                                V2 = "Average Size of Army",
+                                V3 = "Zymotic Diseases",
+                                V4 = "Wounds & Injuries",
+                                V5 = "All Other Causes",
+                                V6 = "Zymotic Diseases",
+                                V7 = "Wounds & Injuries",
+                                V8 = "All Other Causes"),
+               groups = list("", "Deaths", "Annual Rate of Mortality per 1000"))
 
 ### "...the second column represents S, the third column represent D, and the sixth column represents 12000D/S."
 

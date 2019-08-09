@@ -1,0 +1,40 @@
+---
+title: "table"
+---
+
+```{r setup, include=FALSE}
+library(table1)
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+```
+
+```{r}
+nightingale <- read.delim(file = "data.txt", header = FALSE, row.names = NULL, sep = "\t", dec = ".")
+
+nightingale
+```
+
+```{r}
+names(nightingale) <- c("",
+                        "",
+                        "Zymotic Diseases",
+                        "Wounds & Injuries",
+                        "All Other Causes",
+                        "Zymotic Diseases",
+                        "Wounds & Injuries",
+                        "All Other Causes")
+
+nightingale
+```
+
+```{r}
+kable(nightingale) %>%
+  kable_styling("striped") %>%
+  add_header_above(c("Months" = 1, "Average Size of Army" = 1, "Deaths" = 3, "Annual Rate of Mortality per 1000" = 3))
+
+nightingale
+```
+
+
+
