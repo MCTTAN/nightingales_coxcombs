@@ -1,79 +1,55 @@
 
-### Libraries
-# Includes ggplot2, tibble, tidyr, readr, purrr, dplyr.
-library(tidyverse)
-# Includes table formatting tools.
 library(table1)
+library(ggplot2)
+library(knitr)
+library(reshape)
 library(kableExtra)
-# library(DT)
+library(tidyverse)
+library(HistData)
 
-### Data was copied from https://understandinguncertainty.org/node/214
+data(Nightingale)
 
-### Background on Nightingale's Coxcombs can be read at https://understandinguncertainty.org/coxcombs
+# For some graphs, it is more convenient to reshape death rates to long format
+#  keep only Date and death rates
+require(reshape)
+Night<- Nightingale[,c(1,8:10)]
+melted <- melt(Night, "Date")
+names(melted) <- c("Date", "Cause", "Deaths")
+melted$Cause <- sub("\\.rate", "", melted$Cause)
+melted$Regime <- ordered( rep(c(rep('Before', 12), rep('After', 12)), 3), 
+                          levels=c('Before', 'After'))
+Night <- melted
 
-### Build table.
-#read.delim() is a variation of read.table() that imports data as a data frame.
-nightingale <- read.delim(file = "data.txt", header = FALSE, row.names = NULL, sep = "\t", dec = ".")
-nightingale
+# subsets, to facilitate separate plotting
+Night1 <- subset(Night, Date < as.Date("1855-04-01"))
+Night2 <- subset(Night, Date >= as.Date("1855-04-01"))
 
-### Format data frame.
-# Columns
-label(nightingale$V1) <- "Months"
-label(nightingale$V2) <- "Average Size of Army"
-label(nightingale$V3) <- "Deaths: Zymotic Diseases"
-label(nightingale$V4) <- "Deaths: Wounds & Injuries"
-label(nightingale$V5) <- "Deaths: All Other Causes"
-label(nightingale$V6) <- "Annual Rate of Mortality per 1000: Zymotic Diseases"
-label(nightingale$V7) <- "Annual Rate of Mortality per 1000: Wounds & Injuries"
-label(nightingale$V8) <- "Annual Rate of Mortality per 1000: All Other Causes"
-# Units
-# units(nightingale$V6) <- "12000D/S"
-# units(nightingale$V7) <- "12000D/S"
-# units(nightingale$V8) <- "12000D/S"
+# sort according to Deaths in decreasing order, so counts are not obscured [thx: Monique Graf]
+Night1 <- Night1[order(Night1$Deaths, decreasing=TRUE),]
+Night2 <- Night2[order(Night2$Deaths, decreasing=TRUE),]
 
-### Re-build table.
-# table1(~ V1 + V2 + V3 + V4 + V5 + V6 + V7 + V8, data = nightingale)
+# merge the two sorted files
+Night <- rbind(Night1, Night2)
 
 
+require(ggplot2)
+# Before plot
+cxc1 <- ggplot(Night1, aes(x = factor(Date), y=Deaths, fill = Cause)) +
+  # do it as a stacked bar chart first
+  geom_bar(width = 1, position="identity", stat="identity", color="black") +
+  # set scale so area ~ Deaths	
+  scale_y_sqrt() 
+# A coxcomb plot = bar chart + polar coordinates
+cxc1 + coord_polar(start=3*pi/2) + 
+  ggtitle("Causes of Mortality in the Army in the East") + 
+  xlab("")
 
-labels <- list(variables = list(V1 = "Months",
-                                V2 = "Average Size of Army",
-                                V3 = "Zymotic Diseases",
-                                V4 = "Wounds & Injuries",
-                                V5 = "All Other Causes",
-                                V6 = "Zymotic Diseases",
-                                V7 = "Wounds & Injuries",
-                                V8 = "All Other Causes"),
-               groups = list("", "Deaths", "Annual Rate of Mortality per 1000"))
-
-### "...the second column represents S, the third column represent D, and the sixth column represents 12000D/S."
-
-# Create a bar graph.
-
-nightingale_bar <- ggplot(data = nightingale) +
-                   geom_bar(mapping = aes(x = V1, fill = V1),
-                            show.legend = FALSE, width = 1) +
-                   theme(aspect.ratio = 1) +
-                   labs(x = NULL, y = NULL)
-
-nightingale_bar + coord_flip()
-nightingale_bar + coord_polar()
-
-data_diamonds <- diamonds
-data_diamonds
-
-bar <- ggplot(data = diamonds) +
-  geom_bar(
-    mapping = aes(x = cut, fill = cut),
-    show.legend = FALSE,
-    width = 1
-  ) +
-  theme(aspect.ratio = 1) +
-  labs(x = NULL, y = NULL)
-
-bar + coord_flip()
-bar + coord_polar()
-
-
+# After plot
+cxc2 <- ggplot(Night2, aes(x = factor(Date), y=Deaths, fill = Cause)) +
+  geom_bar(width = 1, position="identity", stat="identity", color="black") +
+  scale_y_sqrt()
+cxc2 + coord_polar(start=3*pi/2) +
+  ggtitle("Causes of Mortality in the Army in the East") + 
+  xlab("")
 
 

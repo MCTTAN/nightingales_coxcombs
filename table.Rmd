@@ -4,9 +4,6 @@ title: "table"
 
 ```{r setup, include=FALSE}
 library(table1)
-library(knitr)
-library(kableExtra)
-library(tidyverse)
 ```
 
 ```{r}
@@ -35,6 +32,10 @@ kable(nightingale) %>%
 
 nightingale
 ```
+
+
+
+
 
 
 
